@@ -237,9 +237,8 @@ public class CategoryController {
                 biTrung = danhMucDAO.tonTaiTenDanhMuc(dm.getTenDanhMuc(), loai, soTaiKhoan);
             }
 
-            String errTrung = validateInputDanhMuc(dm.getTenDanhMuc(), biTrung);
-            if (errTrung != null) {
-                showAlert("Lỗi", errTrung);
+            if (biTrung) {
+                showAlert("Lỗi", "Tên danh mục đã tồn tại trong nhóm " + loaiLabel + "!\nVui lòng nhập tên khác.");
                 return;
             }
 
@@ -318,22 +317,17 @@ public class CategoryController {
                     || (parentCu != null && !parentCu.equals(dm.getParentId()));
 
             if (dm.getParentId() != null) {
-                if (daDoiTen || daDoiCha) {
-                    boolean biTrung = danhMucDAO.tonTaiTenDanhMucCon(tenMoi, dm.getLoai(), soTaiKhoan, dm.getId());
-                    String errTrung = validateInputDanhMuc(tenMoi, biTrung);
-                    if (errTrung != null) {
-                        showAlert("Lỗi", errTrung);
-                        return;
-                    }
+                if ((daDoiTen || daDoiCha)
+                        && danhMucDAO.tonTaiTenDanhMucCon(tenMoi, dm.getLoai(), soTaiKhoan, dm.getId())) {
+                    showAlert("Lỗi", "Tên danh mục con đã tồn tại trong nhóm " + dm.getLoai().toUpperCase() +
+                            " (kể cả khác danh mục cha)!\nVui lòng nhập tên khác.");
+                    return;
                 }
             } else {
-                if (daDoiTen) {
-                    boolean biTrung = danhMucDAO.tonTaiTenDanhMuc(tenMoi, dm.getLoai(), soTaiKhoan);
-                    String errTrung = validateInputDanhMuc(tenMoi, biTrung);
-                    if (errTrung != null) {
-                        showAlert("Lỗi", errTrung);
-                        return;
-                    }
+                if (daDoiTen && danhMucDAO.tonTaiTenDanhMuc(tenMoi, dm.getLoai(), soTaiKhoan)) {
+                    showAlert("Lỗi", "Tên danh mục đã tồn tại trong nhóm " + dm.getLoai().toUpperCase() +
+                            "!\nVui lòng nhập tên khác.");
+                    return;
                 }
             }
 
@@ -372,15 +366,6 @@ public class CategoryController {
         if (tenDanhMuc == null || tenDanhMuc.trim().isEmpty()) {
             return "Vui lòng nhập tên danh mục!";
         }
-
-        return null;
-    }
-
-    public static String validateInputDanhMuc(String tenDanhMuc, boolean daTrung) {
-        String err = validateInputDanhMuc(tenDanhMuc);
-        if (err != null) return err;
-
-        if (daTrung) return "Tên danh mục đã tồn tại! Vui lòng nhập tên khác.";
 
         return null;
     }

@@ -82,14 +82,8 @@ public class AdminPasswordController {
 
 
             try {
-                String validationErrorDB = validateInputDoiMatKhau(
-                        cu,
-                        moi,
-                        xacNhan,
-                        nguoiDungDAO.laMatKhauTrungHienTai(LoginController.currentUser.getMaNguoiDung(), moi)
-                );
-                if (validationErrorDB != null) {
-                    lblKetQua.setText(validationErrorDB);
+                if (nguoiDungDAO.laMatKhauTrungHienTai(LoginController.currentUser.getMaNguoiDung(), moi)) {
+                    lblKetQua.setText("Mật khẩu mới trùng với mật khẩu hiện tại!");
                     lblKetQua.setStyle("-fx-text-fill: red;");
                     return;
                 }
@@ -196,24 +190,18 @@ public class AdminPasswordController {
             }
 
 
-            try {
-                String validationErrorDB = validateInputDatLaiMatKhau(
-                        nd,
-                        mkMoi,
-                        mkXn,
-                        nguoiDungDAO.laMatKhauTrungHienTai(nd.getMaNguoiDung(), mkMoi)
-                );
-                if (validationErrorDB != null) {
-                    lblKetQuaReset.setText(validationErrorDB);
-                    lblKetQuaReset.setStyle("-fx-text-fill: red;");
-                    return;
-                }
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("Xác nhận đặt lại mật khẩu");
+            confirm.setHeaderText("Đặt lại mật khẩu cho user: " + nd.getTenDangNhap());
+            confirm.setContentText("STK: " + nd.getSoTaiKhoan() + "\nHọ tên: " + nd.getHoTen() + "\n\nBạn có chắc chắn muốn tiếp tục?");
+            if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+                return;
+            }
 
-                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-                confirm.setTitle("Xác nhận đặt lại mật khẩu");
-                confirm.setHeaderText("Đặt lại mật khẩu cho user: " + nd.getTenDangNhap());
-                confirm.setContentText("STK: " + nd.getSoTaiKhoan() + "\nHọ tên: " + nd.getHoTen() + "\n\nBạn có chắc chắn muốn tiếp tục?");
-                if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+            try {
+                if (nguoiDungDAO.laMatKhauTrungHienTai(nd.getMaNguoiDung(), mkMoi)) {
+                    lblKetQuaReset.setText("Mật khẩu mới trùng với mật khẩu hiện tại của user!");
+                    lblKetQuaReset.setStyle("-fx-text-fill: red;");
                     return;
                 }
 
@@ -267,18 +255,6 @@ public class AdminPasswordController {
         return null;
     }
 
-    public static String validateInputDoiMatKhau(String matKhauCu,
-                                                 String matKhauMoi,
-                                                 String xacNhanMatKhau,
-                                                 boolean trungHienTai) {
-        String err = validateInputDoiMatKhau(matKhauCu, matKhauMoi, xacNhanMatKhau);
-        if (err != null) return err;
-
-        if (trungHienTai) return "Mật khẩu mới trùng với mật khẩu hiện tại!";
-
-        return null;
-    }
-
     public static String validateInputDatLaiMatKhau(NguoiDung nguoiDung,
                                                     String matKhauMoi,
                                                     String xacNhanMatKhau) {
@@ -298,18 +274,6 @@ public class AdminPasswordController {
         if (!matKhauMoi.equals(xacNhanMatKhau)) {
             return "Mật khẩu xác nhận không khớp!";
         }
-
-        return null;
-    }
-
-    public static String validateInputDatLaiMatKhau(NguoiDung nguoiDung,
-                                                    String matKhauMoi,
-                                                    String xacNhanMatKhau,
-                                                    boolean trungHienTai) {
-        String err = validateInputDatLaiMatKhau(nguoiDung, matKhauMoi, xacNhanMatKhau);
-        if (err != null) return err;
-
-        if (trungHienTai) return "Mật khẩu mới trùng với mật khẩu hiện tại của user!";
 
         return null;
     }
