@@ -237,10 +237,8 @@ public class CategoryController {
                 biTrung = danhMucDAO.tonTaiTenDanhMuc(dm.getTenDanhMuc(), loai, soTaiKhoan);
             }
 
-            if (biTrung) {
-                showAlert("Lỗi", "Tên danh mục đã tồn tại trong nhóm " + loaiLabel + "!\nVui lòng nhập tên khác.");
-                return;
-            }
+            String err = validateInputDanhMuc(dm.getTenDanhMuc(), biTrung);
+            if (err != null) { showAlert("Lỗi", err); return; }
 
             if (danhMucDAO.themDanhMuc(dm)) {
                 showAlert("Thành công", "Đã thêm: " + dm.getTenDanhMuc());
@@ -316,20 +314,11 @@ public class CategoryController {
             boolean daDoiCha = (parentCu == null && dm.getParentId() != null)
                     || (parentCu != null && !parentCu.equals(dm.getParentId()));
 
-            if (dm.getParentId() != null) {
-                if ((daDoiTen || daDoiCha)
-                        && danhMucDAO.tonTaiTenDanhMucCon(tenMoi, dm.getLoai(), soTaiKhoan, dm.getId())) {
-                    showAlert("Lỗi", "Tên danh mục con đã tồn tại trong nhóm " + dm.getLoai().toUpperCase() +
-                            " (kể cả khác danh mục cha)!\nVui lòng nhập tên khác.");
-                    return;
-                }
-            } else {
-                if (daDoiTen && danhMucDAO.tonTaiTenDanhMuc(tenMoi, dm.getLoai(), soTaiKhoan)) {
-                    showAlert("Lỗi", "Tên danh mục đã tồn tại trong nhóm " + dm.getLoai().toUpperCase() +
-                            "!\nVui lòng nhập tên khác.");
-                    return;
-                }
-            }
+            boolean biTrung = dm.getParentId() != null
+                    ? (daDoiTen || daDoiCha) && danhMucDAO.tonTaiTenDanhMucCon(tenMoi, dm.getLoai(), soTaiKhoan, dm.getId())
+                    : daDoiTen && danhMucDAO.tonTaiTenDanhMuc(tenMoi, dm.getLoai(), soTaiKhoan);
+            String err = validateInputDanhMuc(tenMoi, biTrung);
+            if (err != null) { showAlert("Lỗi", err); return; }
 
             if (danhMucDAO.suaDanhMuc(dm)) {
                 showAlert("Thành công", "Đã cập nhật danh mục!");
@@ -366,6 +355,15 @@ public class CategoryController {
         if (tenDanhMuc == null || tenDanhMuc.trim().isEmpty()) {
             return "Vui lòng nhập tên danh mục!";
         }
+
+        return null;
+    }
+
+    public static String validateInputDanhMuc(String tenDanhMuc, boolean daTrung) {
+        String err = validateInputDanhMuc(tenDanhMuc);
+        if (err != null) return err;
+
+        if (daTrung) return "Tên danh mục đã tồn tại! Vui lòng nhập tên khác.";
 
         return null;
     }

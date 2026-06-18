@@ -73,17 +73,12 @@ public class AdminPasswordController {
             String moi = txtMoi.getText();
             String xacNhan = txtXacNhan.getText();
 
-            String validationError = validateInputDoiMatKhau(cu, moi, xacNhan);
-            if (validationError != null) {
-                lblKetQua.setText(validationError);
-                lblKetQua.setStyle("-fx-text-fill: red;");
-                return;
-            }
-
-
             try {
-                if (nguoiDungDAO.laMatKhauTrungHienTai(LoginController.currentUser.getMaNguoiDung(), moi)) {
-                    lblKetQua.setText("Mật khẩu mới trùng với mật khẩu hiện tại!");
+                boolean trung = nguoiDungDAO.laMatKhauTrungHienTai(
+                        LoginController.currentUser.getMaNguoiDung(), moi);
+                String validationError = validateInputDoiMatKhau(cu, moi, xacNhan, trung);
+                if (validationError != null) {
+                    lblKetQua.setText(validationError);
                     lblKetQua.setStyle("-fx-text-fill: red;");
                     return;
                 }
@@ -182,13 +177,19 @@ public class AdminPasswordController {
             String mkMoi = txtMatKhauMoiUser.getText();
             String mkXn = txtXacNhanUser.getText();
 
-            String validationError = validateInputDatLaiMatKhau(nd, mkMoi, mkXn);
-            if (validationError != null) {
-                lblKetQuaReset.setText(validationError);
+            try {
+                boolean trung = nd != null && nguoiDungDAO.laMatKhauTrungHienTai(nd.getMaNguoiDung(), mkMoi);
+                String validationError = validateInputDatLaiMatKhau(nd, mkMoi, mkXn, trung);
+                if (validationError != null) {
+                    lblKetQuaReset.setText(validationError);
+                    lblKetQuaReset.setStyle("-fx-text-fill: red;");
+                    return;
+                }
+            } catch (Exception ex) {
+                lblKetQuaReset.setText("Lỗi: " + ex.getMessage());
                 lblKetQuaReset.setStyle("-fx-text-fill: red;");
                 return;
             }
-
 
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
             confirm.setTitle("Xác nhận đặt lại mật khẩu");
@@ -199,12 +200,6 @@ public class AdminPasswordController {
             }
 
             try {
-                if (nguoiDungDAO.laMatKhauTrungHienTai(nd.getMaNguoiDung(), mkMoi)) {
-                    lblKetQuaReset.setText("Mật khẩu mới trùng với mật khẩu hiện tại của user!");
-                    lblKetQuaReset.setStyle("-fx-text-fill: red;");
-                    return;
-                }
-
                 boolean ok = nguoiDungDAO.datLaiMatKhauChoUser(nd.getMaNguoiDung(), mkMoi);
                 if (ok) {
                     lblKetQuaReset.setText("Đặt lại mật khẩu thành công cho user " + nd.getTenDangNhap() + "!");
@@ -255,6 +250,18 @@ public class AdminPasswordController {
         return null;
     }
 
+    public static String validateInputDoiMatKhau(String matKhauCu,
+                                                 String matKhauMoi,
+                                                 String xacNhanMatKhau,
+                                                 boolean trungHienTai) {
+        String err = validateInputDoiMatKhau(matKhauCu, matKhauMoi, xacNhanMatKhau);
+        if (err != null) return err;
+
+        if (trungHienTai) return "Mật khẩu mới trùng với mật khẩu hiện tại!";
+
+        return null;
+    }
+
     public static String validateInputDatLaiMatKhau(NguoiDung nguoiDung,
                                                     String matKhauMoi,
                                                     String xacNhanMatKhau) {
@@ -274,6 +281,18 @@ public class AdminPasswordController {
         if (!matKhauMoi.equals(xacNhanMatKhau)) {
             return "Mật khẩu xác nhận không khớp!";
         }
+
+        return null;
+    }
+
+    public static String validateInputDatLaiMatKhau(NguoiDung nguoiDung,
+                                                    String matKhauMoi,
+                                                    String xacNhanMatKhau,
+                                                    boolean trungHienTai) {
+        String err = validateInputDatLaiMatKhau(nguoiDung, matKhauMoi, xacNhanMatKhau);
+        if (err != null) return err;
+
+        if (trungHienTai) return "Mật khẩu mới trùng với mật khẩu hiện tại của user!";
 
         return null;
     }

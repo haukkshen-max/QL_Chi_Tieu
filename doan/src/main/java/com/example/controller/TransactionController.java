@@ -388,10 +388,13 @@ public class TransactionController {
             String noiDung = txtNoiDung.getText() != null ? txtNoiDung.getText().trim() : "";
             String soTaiKhoanGui = LoginController.currentUser.getSoTaiKhoan();
 
+            String soTaiKhoanNhanHopLe = soTaiKhoanNhan != null ? soTaiKhoanNhan.trim() : "";
+            String tenNguoiNhan = giaoDichDAO.layTenNguoiDungThuong(soTaiKhoanNhanHopLe);
             String validationError = validateInputChuyenTien(
                     soTaiKhoanNhan,
                     soTienStr,
-                    soTaiKhoanGui
+                    soTaiKhoanGui,
+                    tenNguoiNhan
             );
             if (validationError != null) {
                 showError(validationError);
@@ -399,14 +402,6 @@ public class TransactionController {
             }
 
             BigDecimal soTien = MoneyInputUtil.parseMoney(soTienStr);
-            String soTaiKhoanNhanHopLe = soTaiKhoanNhan.trim();
-            
-            // Kiểm tra tài khoản người nhận có tồn tại
-            String tenNguoiNhan = giaoDichDAO.layTenNguoiDungThuong(soTaiKhoanNhanHopLe);
-            if (tenNguoiNhan == null) {
-                showError("Số tài khoản người nhận không hợp lệ hoặc không tồn tại!");
-                return;
-            }
             
             // Lấy danh mục đã chọn
             DanhMuc danhMuc = cbDanhMuc.getValue();
@@ -551,7 +546,7 @@ public class TransactionController {
         }
 
         if (!soTaiKhoanNhan.trim().matches("\\d+")) {
-            return "Sá»‘ tÃ i khoáº£n ngÆ°á»i nháº­n khÃ´ng há»£p lá»‡!";
+            return "Số tài khoản người nhận không hợp lệ!";
         }
 
         if (soTienStr == null || soTienStr.trim().isEmpty()) {
@@ -576,11 +571,25 @@ public class TransactionController {
         }
 
         if (soTaiKhoanGui == null || soTaiKhoanGui.trim().isEmpty()) {
-            return "KhÃ´ng xÃ¡c Ä‘á»‹nh Ä‘Æ°á»£c tÃ i khoáº£n ngÆ°á»i gá»­i!";
+            return "Không xác định được tài khoản người gửi!";
         }
 
         if (soTaiKhoanGui.equals(soTaiKhoanNhan.trim())) {
             return "Không thể chuyển tiền cho chính mình!";
+        }
+
+        return null;
+    }
+
+    public static String validateInputChuyenTien(String soTaiKhoanNhan,
+                                                 String soTienStr,
+                                                 String soTaiKhoanGui,
+                                                 String tenNguoiNhan) {
+        String err = validateInputChuyenTien(soTaiKhoanNhan, soTienStr, soTaiKhoanGui);
+        if (err != null) return err;
+
+        if (tenNguoiNhan == null) {
+            return "Số tài khoản người nhận không hợp lệ hoặc không tồn tại!";
         }
 
         return null;

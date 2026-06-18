@@ -298,19 +298,14 @@ public class BudgetController {
                     Integer thang = cbThangMoi.getValue();
                     Integer nam = cbNamMoi.getValue();
 
-                    String validationError = validateInputThemNganSach(dm, gioiHanStr, thang, nam);
+                    boolean daTonTai = dm != null && thang != null && nam != null
+                            && nganSachDAO.kiemTraTonTai(soTaiKhoan, dm.getId(), thang, nam);
+                    String validationError = validateInputThemNganSach(dm, gioiHanStr, thang, nam, daTonTai);
                     if (validationError != null) {
                         showAlert("Lỗi", validationError);
                         return null;
                     }
                     BigDecimal gioiHanBD = MoneyInputUtil.parseMoney(gioiHanStr);
-
-                    if (nganSachDAO.kiemTraTonTai(soTaiKhoan, dm.getId(), thang, nam)) {
-                        showAlert("Lỗi", "Ngân sách cho danh mục \"" + dm.getTenDanhMuc() + 
-                                 "\" tháng " + thang + "/" + nam + " đã tồn tại!\n" +
-                                 "Vui lòng chọn danh mục hoặc tháng khác.");
-                        return null;
-                    }
                     
                     NganSach ns = new NganSach();
                     ns.setDanhMucId(dm.getId());
@@ -391,6 +386,22 @@ public class BudgetController {
         }
 
         return validateInputSuaNganSach(gioiHanStr);
+    }
+
+    public static String validateInputThemNganSach(DanhMuc danhMuc,
+                                                   String gioiHanStr,
+                                                   Integer thang,
+                                                   Integer nam,
+                                                   boolean nganSachDaTonTai) {
+        String err = validateInputThemNganSach(danhMuc, gioiHanStr, thang, nam);
+        if (err != null) return err;
+
+        if (nganSachDaTonTai) {
+            return "Ngân sách cho danh mục \"" + danhMuc.getTenDanhMuc() + "\" tháng "
+                    + thang + "/" + nam + " đã tồn tại!\nVui lòng chọn danh mục hoặc tháng khác.";
+        }
+
+        return null;
     }
 
     public static String validateInputSuaNganSach(String gioiHanStr) {

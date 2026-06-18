@@ -194,10 +194,8 @@ public class AdminExpenseCategoryController {
                 biTrung = danhMucDAO.tonTaiTenDanhMuc(dm.getTenDanhMuc(), dm.getLoai(), null);
             }
 
-            if (biTrung) {
-                showAlert("Lỗi", "Tên danh mục Chi mặc định đã tồn tại!\nVui lòng nhập tên khác.");
-                return;
-            }
+            String err = validateInputDanhMuc(dm.getTenDanhMuc(), biTrung);
+            if (err != null) { showAlert("Lỗi", err); return; }
 
             if (danhMucDAO.themDanhMuc(dm)) {
                 showAlert("Thành công", "Đã thêm danh mục: " + dm.getTenDanhMuc());
@@ -283,18 +281,11 @@ public class AdminExpenseCategoryController {
             boolean daDoiCha = (parentCu == null && dm.getParentId() != null)
                     || (parentCu != null && !parentCu.equals(dm.getParentId()));
 
-            if (dm.getParentId() != null) {
-                if ((daDoiTen || daDoiCha)
-                        && danhMucDAO.tonTaiTenDanhMucCon(tenMoi, dm.getLoai(), null, dm.getId())) {
-                    showAlert("Lỗi", "Tên danh mục con Chi mặc định đã tồn tại (kể cả khác danh mục cha)!\nVui lòng nhập tên khác.");
-                    return;
-                }
-            } else {
-                if (daDoiTen && danhMucDAO.tonTaiTenDanhMuc(tenMoi, dm.getLoai(), null)) {
-                    showAlert("Lỗi", "Tên danh mục Chi mặc định đã tồn tại!\nVui lòng nhập tên khác.");
-                    return;
-                }
-            }
+            boolean biTrung = dm.getParentId() != null
+                    ? (daDoiTen || daDoiCha) && danhMucDAO.tonTaiTenDanhMucCon(tenMoi, dm.getLoai(), null, dm.getId())
+                    : daDoiTen && danhMucDAO.tonTaiTenDanhMuc(tenMoi, dm.getLoai(), null);
+            String err = validateInputDanhMuc(tenMoi, biTrung);
+            if (err != null) { showAlert("Lỗi", err); return; }
 
             if (danhMucDAO.suaDanhMuc(dm)) {
                 showAlert("Thành công", "Đã cập nhật danh mục!");
@@ -334,6 +325,15 @@ public class AdminExpenseCategoryController {
         if (tenDanhMuc == null || tenDanhMuc.trim().isEmpty()) {
             return "Vui lòng nhập tên danh mục!";
         }
+
+        return null;
+    }
+
+    public static String validateInputDanhMuc(String tenDanhMuc, boolean daTrung) {
+        String err = validateInputDanhMuc(tenDanhMuc);
+        if (err != null) return err;
+
+        if (daTrung) return "Tên danh mục đã tồn tại! Vui lòng nhập tên khác.";
 
         return null;
     }

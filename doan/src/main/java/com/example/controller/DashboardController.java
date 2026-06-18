@@ -837,17 +837,12 @@ public class DashboardController {
             String moi = txtMoi.getText();
             String xn = txtXacNhan.getText();
 
-            String validationError = validateInputDoiMatKhau(cu, moi, xn);
-            if (validationError != null) {
-                lblKetQua.setText(validationError);
-                lblKetQua.setStyle("-fx-text-fill: red;");
-                ev.consume();
-                return;
-            }
-
             try {
-                if (nguoiDungDAO.laMatKhauTrungHienTai(LoginController.currentUser.getMaNguoiDung(), moi)) {
-                    lblKetQua.setText("Mật khẩu mới trùng với mật khẩu hiện tại!");
+                boolean trung = nguoiDungDAO.laMatKhauTrungHienTai(
+                        LoginController.currentUser.getMaNguoiDung(), moi);
+                String validationError = validateInputDoiMatKhau(cu, moi, xn, trung);
+                if (validationError != null) {
+                    lblKetQua.setText(validationError);
                     lblKetQua.setStyle("-fx-text-fill: red;");
                     ev.consume();
                     return;
@@ -903,6 +898,18 @@ public class DashboardController {
         if (!matKhauMoi.equals(xacNhanMatKhau)) {
             return "Mật khẩu xác nhận không khớp!";
         }
+
+        return null;
+    }
+
+    public static String validateInputDoiMatKhau(String matKhauCu,
+                                                 String matKhauMoi,
+                                                 String xacNhanMatKhau,
+                                                 boolean trungHienTai) {
+        String err = validateInputDoiMatKhau(matKhauCu, matKhauMoi, xacNhanMatKhau);
+        if (err != null) return err;
+
+        if (trungHienTai) return "Mật khẩu mới trùng với mật khẩu hiện tại!";
 
         return null;
     }

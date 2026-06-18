@@ -138,21 +138,13 @@ public class RegisterController {
         String matKhau = txtMatKhau.getText();
         String xacNhanMatKhau = txtXacNhanMatKhau.getText();
 
-        String validationError = validateInputDangKy(hoTen, tenDangNhap, email, matKhau, xacNhanMatKhau);
-        if (validationError != null) {
-            lblThongBao.setText(validationError);
-            lblThongBao.setStyle("-fx-text-fill: red;");
-            return;
-        }
         try {
-            if (nguoiDungDAO.tonTaiTenDangNhap(tenDangNhap)) {
-                lblThongBao.setText("Tên đăng nhập đã tồn tại!");
-                lblThongBao.setStyle("-fx-text-fill: red;");
-                return;
-            }
-
-            if (nguoiDungDAO.tonTaiEmail(email)) {
-                lblThongBao.setText("Email đã tồn tại!");
+            boolean tenTonTai = nguoiDungDAO.tonTaiTenDangNhap(tenDangNhap);
+            boolean emailTonTai = nguoiDungDAO.tonTaiEmail(email);
+            String validationError = validateInputDangKy(
+                    hoTen, tenDangNhap, email, matKhau, xacNhanMatKhau, tenTonTai, emailTonTai);
+            if (validationError != null) {
+                lblThongBao.setText(validationError);
                 lblThongBao.setStyle("-fx-text-fill: red;");
                 return;
             }
@@ -210,6 +202,22 @@ public class RegisterController {
         if (!matKhau.equals(xacNhanMatKhau)) {
             return "Mật khẩu xác nhận không khớp!";
         }
+
+        return null;
+    }
+
+    public static String validateInputDangKy(String hoTen,
+                                             String tenDangNhap,
+                                             String email,
+                                             String matKhau,
+                                             String xacNhanMatKhau,
+                                             boolean tenDangNhapDaTonTai,
+                                             boolean emailDaTonTai) {
+        String err = validateInputDangKy(hoTen, tenDangNhap, email, matKhau, xacNhanMatKhau);
+        if (err != null) return err;
+
+        if (tenDangNhapDaTonTai) return "Tên đăng nhập đã tồn tại!";
+        if (emailDaTonTai) return "Email đã tồn tại!";
 
         return null;
     }
