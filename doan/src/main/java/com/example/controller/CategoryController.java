@@ -347,17 +347,10 @@ public class CategoryController {
         });
     }
 
-    public static String validateInputDanhMuc(String tenDanhMuc) {
+    public static String validateInputDanhMuc(String tenDanhMuc, boolean daTrung) {
         if (tenDanhMuc == null || tenDanhMuc.trim().isEmpty()) {
             return "Vui lòng nhập tên danh mục!";
         }
-
-        return null;
-    }
-
-    public static String validateInputDanhMuc(String tenDanhMuc, boolean daTrung) {
-        String err = validateInputDanhMuc(tenDanhMuc);
-        if (err != null) return err;
 
         if (daTrung) return "Tên danh mục đã tồn tại! Vui lòng nhập tên khác.";
 

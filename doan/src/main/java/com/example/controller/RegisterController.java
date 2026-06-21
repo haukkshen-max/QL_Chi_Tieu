@@ -186,7 +186,9 @@ public class RegisterController {
                                              String tenDangNhap,
                                              String email,
                                              String matKhau,
-                                             String xacNhanMatKhau) {
+                                             String xacNhanMatKhau,
+                                             boolean tenDangNhapDaTonTai,
+                                             boolean emailDaTonTai) {
         if (tenDangNhap == null || tenDangNhap.trim().isEmpty()
                 || email == null || email.trim().isEmpty()
                 || hoTen == null || hoTen.trim().isEmpty()
@@ -202,19 +204,6 @@ public class RegisterController {
         if (!matKhau.equals(xacNhanMatKhau)) {
             return "Mật khẩu xác nhận không khớp!";
         }
-
-        return null;
-    }
-
-    public static String validateInputDangKy(String hoTen,
-                                             String tenDangNhap,
-                                             String email,
-                                             String matKhau,
-                                             String xacNhanMatKhau,
-                                             boolean tenDangNhapDaTonTai,
-                                             boolean emailDaTonTai) {
-        String err = validateInputDangKy(hoTen, tenDangNhap, email, matKhau, xacNhanMatKhau);
-        if (err != null) return err;
 
         if (tenDangNhapDaTonTai) return "Tên đăng nhập đã tồn tại!";
         if (emailDaTonTai) return "Email đã tồn tại!";

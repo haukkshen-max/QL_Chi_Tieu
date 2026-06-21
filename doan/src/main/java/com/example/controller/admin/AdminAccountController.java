@@ -534,7 +534,7 @@ public class AdminAccountController {
         return null;
     }
 
-    public static String validateInputNapTien(NguoiDung target, String soTienStr) {
+    public static String validateInputNapTien(NguoiDung target, String soTienStr, String soTaiKhoanAdmin) {
         if (target == null) {
             return "Vui lòng nhập STK hợp lệ trước khi nạp tiền!";
         }
@@ -558,47 +558,17 @@ public class AdminAccountController {
             return "Số tiền không hợp lệ!";
         }
 
-        return null;
-    }
-
-    public static String validateInputNapTien(NguoiDung target, String soTienStr, String soTaiKhoanAdmin) {
-        String err = validateInputNapTien(target, soTienStr);
-        if (err != null) return err;
-
         if (soTaiKhoanAdmin == null || soTaiKhoanAdmin.isBlank()) {
             return "Không xác định được tài khoản Admin để ghi lịch sử giao dịch!";
-        }
-
-        return null;
-    }
-
-    public static String validateInputNguoiNhanNapTien(NguoiDung target) {
-        if (target == null) {
-            return "Không xác định được user nhận tiền!";
-        }
-
-        return null;
-    }
-
-    public static String validateInputTaiKhoanAdmin(String soTaiKhoanAdmin) {
-        if (soTaiKhoanAdmin == null || soTaiKhoanAdmin.isBlank()) {
-            return "Không xác định được tài khoản Admin để ghi lịch sử giao dịch!";
-        }
-
-        return null;
-    }
-
-    public static String validateInputXemThongTinTaiKhoan(NguoiDung selected) {
-        if (selected == null) {
-            return "Vui lòng chọn user cần xem thông tin!";
         }
 
         return null;
     }
 
     public static String validateInputXemThongTinTaiKhoan(NguoiDung selected, NguoiDung thongTinNguoiDung) {
-        String err = validateInputXemThongTinTaiKhoan(selected);
-        if (err != null) return err;
+        if (selected == null) {
+            return "Vui lòng chọn user cần xem thông tin!";
+        }
 
         if (thongTinNguoiDung == null) {
             return "Không tìm thấy thông tin người dùng trong cơ sở dữ liệu!";

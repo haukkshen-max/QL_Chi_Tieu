@@ -536,11 +536,11 @@ public class TransactionController {
         });
     }
 
-    // Helper dùng chung: kiểm tra vượt ngân sách và hỏi user có tiếp tục không
-    // Trả về true = tiếp tục, false = hủy
+    // Validate dữ liệu chuyển tiền trước khi gọi DAO
     public static String validateInputChuyenTien(String soTaiKhoanNhan,
                                                 String soTienStr,
-                                                String soTaiKhoanGui) {
+                                                String soTaiKhoanGui,
+                                                String tenNguoiNhan) {
         if (soTaiKhoanNhan == null || soTaiKhoanNhan.trim().isEmpty()) {
             return "Vui lòng nhập số tài khoản người nhận!";
         }
@@ -578,25 +578,11 @@ public class TransactionController {
             return "Không thể chuyển tiền cho chính mình!";
         }
 
-        return null;
-    }
-
-    public static String validateInputChuyenTien(String soTaiKhoanNhan,
-                                                 String soTienStr,
-                                                 String soTaiKhoanGui,
-                                                 String tenNguoiNhan) {
-        String err = validateInputChuyenTien(soTaiKhoanNhan, soTienStr, soTaiKhoanGui);
-        if (err != null) return err;
-
         if (tenNguoiNhan == null) {
             return "Số tài khoản người nhận không hợp lệ hoặc không tồn tại!";
         }
 
         return null;
-    }
-
-    public static String validateInputTienMat(String soTienStr, DanhMuc danhMuc) {
-        return validateInputTienMat(null, soTienStr, danhMuc);
     }
 
     public static String validateInputTienMat(String loai, String soTienStr, DanhMuc danhMuc) {

@@ -375,7 +375,8 @@ public class BudgetController {
     public static String validateInputThemNganSach(DanhMuc danhMuc,
                                                    String gioiHanStr,
                                                    Integer thang,
-                                                   Integer nam) {
+                                                   Integer nam,
+                                                   boolean nganSachDaTonTai) {
         if (danhMuc == null || gioiHanStr == null || gioiHanStr.trim().isEmpty()
                 || thang == null || nam == null) {
             return "Vui lòng điền đầy đủ thông tin!";
@@ -385,15 +386,7 @@ public class BudgetController {
             return "Tháng không hợp lệ!";
         }
 
-        return validateInputSuaNganSach(gioiHanStr);
-    }
-
-    public static String validateInputThemNganSach(DanhMuc danhMuc,
-                                                   String gioiHanStr,
-                                                   Integer thang,
-                                                   Integer nam,
-                                                   boolean nganSachDaTonTai) {
-        String err = validateInputThemNganSach(danhMuc, gioiHanStr, thang, nam);
+        String err = validateInputSuaNganSach(gioiHanStr);
         if (err != null) return err;
 
         if (nganSachDaTonTai) {

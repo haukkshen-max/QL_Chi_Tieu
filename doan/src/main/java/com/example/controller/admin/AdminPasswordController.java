@@ -232,7 +232,8 @@ public class AdminPasswordController {
 
     public static String validateInputDoiMatKhau(String matKhauCu,
                                                  String matKhauMoi,
-                                                 String xacNhanMatKhau) {
+                                                 String xacNhanMatKhau,
+                                                 boolean trungHienTai) {
         if (matKhauCu == null || matKhauCu.isEmpty()
                 || matKhauMoi == null || matKhauMoi.isEmpty()
                 || xacNhanMatKhau == null || xacNhanMatKhau.isEmpty()) {
@@ -247,16 +248,6 @@ public class AdminPasswordController {
             return "Mật khẩu xác nhận không khớp!";
         }
 
-        return null;
-    }
-
-    public static String validateInputDoiMatKhau(String matKhauCu,
-                                                 String matKhauMoi,
-                                                 String xacNhanMatKhau,
-                                                 boolean trungHienTai) {
-        String err = validateInputDoiMatKhau(matKhauCu, matKhauMoi, xacNhanMatKhau);
-        if (err != null) return err;
-
         if (trungHienTai) return "Mật khẩu mới trùng với mật khẩu hiện tại!";
 
         return null;
@@ -264,7 +255,8 @@ public class AdminPasswordController {
 
     public static String validateInputDatLaiMatKhau(NguoiDung nguoiDung,
                                                     String matKhauMoi,
-                                                    String xacNhanMatKhau) {
+                                                    String xacNhanMatKhau,
+                                                    boolean trungHienTai) {
         if (nguoiDung == null) {
             return "Vui lòng nhập STK user hợp lệ!";
         }
@@ -281,16 +273,6 @@ public class AdminPasswordController {
         if (!matKhauMoi.equals(xacNhanMatKhau)) {
             return "Mật khẩu xác nhận không khớp!";
         }
-
-        return null;
-    }
-
-    public static String validateInputDatLaiMatKhau(NguoiDung nguoiDung,
-                                                    String matKhauMoi,
-                                                    String xacNhanMatKhau,
-                                                    boolean trungHienTai) {
-        String err = validateInputDatLaiMatKhau(nguoiDung, matKhauMoi, xacNhanMatKhau);
-        if (err != null) return err;
 
         if (trungHienTai) return "Mật khẩu mới trùng với mật khẩu hiện tại của user!";
 

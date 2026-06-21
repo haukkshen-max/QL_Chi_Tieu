@@ -873,11 +873,11 @@ public class DashboardController {
         }
     }
 
-    // Helper kiểm tra vượt ngân sách — nhận thang/nam từ ngoài vì có thể là tháng của giao dịch cũ
-    // Trả về true = tiếp tục, false = hủy
+    // Validate dữ liệu đổi mật khẩu
     public static String validateInputDoiMatKhau(String matKhauCu,
                                                  String matKhauMoi,
-                                                 String xacNhanMatKhau) {
+                                                 String xacNhanMatKhau,
+                                                 boolean trungHienTai) {
         if (matKhauCu == null || matKhauCu.isEmpty()
                 || matKhauMoi == null || matKhauMoi.isEmpty()
                 || xacNhanMatKhau == null || xacNhanMatKhau.isEmpty()) {
@@ -892,25 +892,7 @@ public class DashboardController {
             return "Mật khẩu xác nhận không khớp!";
         }
 
-        return null;
-    }
-
-    public static String validateInputDoiMatKhau(String matKhauCu,
-                                                 String matKhauMoi,
-                                                 String xacNhanMatKhau,
-                                                 boolean trungHienTai) {
-        String err = validateInputDoiMatKhau(matKhauCu, matKhauMoi, xacNhanMatKhau);
-        if (err != null) return err;
-
         if (trungHienTai) return "Mật khẩu mới trùng với mật khẩu hiện tại!";
-
-        return null;
-    }
-
-    public static String validateInputDoiDanhMuc(GiaoDichInfo selected) {
-        if (selected == null) {
-            return "Vui lòng chọn giao dịch cần đổi danh mục!";
-        }
 
         return null;
     }
@@ -918,8 +900,9 @@ public class DashboardController {
     public static String validateInputDoiDanhMuc(GiaoDichInfo selected,
                                                  boolean khongCoDanhMucCon,
                                                  String loaiDanhMucLabel) {
-        String err = validateInputDoiDanhMuc(selected);
-        if (err != null) return err;
+        if (selected == null) {
+            return "Vui lòng chọn giao dịch cần đổi danh mục!";
+        }
 
         if (khongCoDanhMucCon) {
             return "Chưa có danh mục con loại " + loaiDanhMucLabel + ".\n"
