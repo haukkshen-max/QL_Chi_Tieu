@@ -334,15 +334,16 @@ public class BudgetController {
     
     private void handleSua() {
         NganSach selected = table.getSelectionModel().getSelectedItem();
-        String giaTriCu = selected != null
-                ? String.format("%,.0f", selected.getGioiHan().doubleValue()).replace(',', '.')
-                : "";
-        TextInputDialog dialog = new TextInputDialog(giaTriCu);
+        String validationError = validateInputChonNganSach(selected, "sua");
+        if (validationError != null) {
+            showAlert("Lỗi", validationError);
+            return;
+        }
+        
+        TextInputDialog dialog = new TextInputDialog(String.format("%,.0f", selected.getGioiHan().doubleValue()).replace(',', '.'));
         dialog.setTitle("Sửa Ngân Sách");
-        dialog.setHeaderText(selected != null
-                ? "Sửa giới hạn cho: " + selected.getTenDanhMuc() + " (Tháng "
-                    + selected.getThang() + "/" + selected.getNam() + ")"
-                : "Sửa giới hạn ngân sách");
+        dialog.setHeaderText("Sửa giới hạn cho: " + selected.getTenDanhMuc() + " (Tháng " + 
+                            selected.getThang() + "/" + selected.getNam() + ")");
         dialog.setContentText("Giới hạn mới (tối đa 9,999,999,999):");
 
         TextField txtEditor = dialog.getEditor();
@@ -350,9 +351,9 @@ public class BudgetController {
         
         dialog.showAndWait().ifPresent(gioiHanStr -> {
             try {
-                String err = validateInputSuaNganSach(selected, gioiHanStr);
-                if (err != null) {
-                    showAlert("Lỗi", err);
+                String inputError = validateInputSuaNganSach(gioiHanStr);
+                if (inputError != null) {
+                    showAlert("Lỗi", inputError);
                     return;
                 }
 
@@ -424,13 +425,6 @@ public class BudgetController {
         }
 
         return null;
-    }
-
-    public static String validateInputSuaNganSach(NganSach selected, String gioiHanStr) {
-        String err = validateInputChonNganSach(selected, "sua");
-        if (err != null) return err;
-
-        return validateInputSuaNganSach(gioiHanStr);
     }
 
     public static String validateInputChonNganSach(NganSach selected, String hanhDong) {

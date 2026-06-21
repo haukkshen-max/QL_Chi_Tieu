@@ -203,31 +203,36 @@ public class AdminExpenseCategoryController {
 
     private void handleSuaDanhMuc() {
         DanhMuc selected = tableDanhMuc.getSelectionModel().getSelectedItem();
-        final String tenCu = selected != null && selected.getTenDanhMuc() != null ? selected.getTenDanhMuc().trim() : "";
-        final Integer parentCu = selected != null ? selected.getParentId() : null;
+        String validationError = validateInputChonDanhMuc(selected, "sua");
+        if (validationError != null) {
+            showAlert("Lỗi", validationError);
+            return;
+        }
+        final String tenCu = selected.getTenDanhMuc() != null ? selected.getTenDanhMuc().trim() : "";
+        final Integer parentCu = selected.getParentId();
 
         Dialog<DanhMuc> dialog = new Dialog<>();
         dialog.setTitle("Sửa danh mục");
-        dialog.setHeaderText("Chỉnh sửa: " + (selected != null ? selected.getTenDanhMuc() : ""));
+        dialog.setHeaderText("Chỉnh sửa: " + selected.getTenDanhMuc());
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20));
 
-        TextField txtTen = new TextField(selected != null ? selected.getTenDanhMuc() : "");
+        TextField txtTen = new TextField(selected.getTenDanhMuc());
         txtTen.setPrefWidth(300);
 
-        TextArea txtMoTa = new TextArea(selected != null && selected.getMoTa() != null ? selected.getMoTa() : "");
+        TextArea txtMoTa = new TextArea(selected.getMoTa() != null ? selected.getMoTa() : "");
         txtMoTa.setPrefRowCount(3);
         txtMoTa.setPrefWidth(300);
 
         ComboBox<DanhMuc> cbCha = new ComboBox<>();
         cbCha.setPrefWidth(300);
         cbCha.setPromptText("(Không có - danh mục gốc)");
-        List<DanhMuc> dsCha = selected != null ? layDanhMucChaMacDinh("chi", selected.getId()) : new ArrayList<>();
+        List<DanhMuc> dsCha = layDanhMucChaMacDinh("chi", selected.getId());
         cbCha.getItems().setAll(dsCha);
-        if (selected != null && selected.getParentId() != null) {
+        if (selected.getParentId() != null) {
             for (DanhMuc dm : dsCha) {
                 if (dm.getId() == selected.getParentId()) {
                     cbCha.setValue(dm);
@@ -251,11 +256,11 @@ public class AdminExpenseCategoryController {
             if (btn == btnOK) {
                 String ten = txtTen.getText().trim();
                 return new DanhMuc(
-                        selected != null ? selected.getId() : 0,
+                        selected.getId(),
                         ten,
                         txtMoTa.getText().trim(),
-                        selected != null ? selected.getLoai() : "chi",
-                        selected != null ? selected.getSoTaiKhoan() : null,
+                        selected.getLoai(),
+                        selected.getSoTaiKhoan(),
                         cbCha.getValue() != null ? cbCha.getValue().getId() : null,
                         null
                 );
@@ -269,10 +274,10 @@ public class AdminExpenseCategoryController {
             boolean daDoiCha = (parentCu == null && dm.getParentId() != null)
                     || (parentCu != null && !parentCu.equals(dm.getParentId()));
 
-            boolean biTrung = selected != null && (dm.getParentId() != null
+            boolean biTrung = dm.getParentId() != null
                     ? (daDoiTen || daDoiCha) && danhMucDAO.tonTaiTenDanhMucCon(tenMoi, dm.getLoai(), null, dm.getId())
-                    : daDoiTen && danhMucDAO.tonTaiTenDanhMuc(tenMoi, dm.getLoai(), null));
-            String err = validateInputSuaDanhMuc(selected, tenMoi, biTrung);
+                    : daDoiTen && danhMucDAO.tonTaiTenDanhMuc(tenMoi, dm.getLoai(), null);
+            String err = validateInputDanhMuc(tenMoi, biTrung);
             if (err != null) { showAlert("Lỗi", err); return; }
 
             if (danhMucDAO.suaDanhMuc(dm)) {
@@ -335,13 +340,6 @@ public class AdminExpenseCategoryController {
         }
 
         return null;
-    }
-
-    public static String validateInputSuaDanhMuc(DanhMuc selected, String tenMoi, boolean biTrung) {
-        String err = validateInputChonDanhMuc(selected, "sua");
-        if (err != null) return err;
-
-        return validateInputDanhMuc(tenMoi, biTrung);
     }
 
     private List<DanhMuc> layDanhMucChaMacDinh(String loai, Integer excludeId) {
